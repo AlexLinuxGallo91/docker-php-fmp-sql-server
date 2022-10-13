@@ -22,22 +22,28 @@ RUN docker-php-ext-install mysqli pdo pdo_mysql
 RUN docker-php-ext-enable pdo_mysql
 
 # install SQL ext PHP
-RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add -
-RUN curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list
 
-RUN apt-get update
-RUN ACCEPT_EULA=Y apt-get install -y msodbcsql18
+ENV ACCEPT_EULA=Y
 
-RUN ACCEPT_EULA=Y apt-get install -y mssql-tools18
-RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
-# RUN source ~/.bashrc
-RUN . ~/.bashrc
-RUN apt-get install -y unixodbc-dev
+# Install prerequisites required for tools and extensions installed later on.
+RUN apt-get update \
+    && apt-get install -y apt-transport-https gnupg2 libpng-dev libzip-dev unzip \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN pecl config-set php_ini /etc/php/8.1/fpm/php.ini
-RUN pecl install sqlsrv
-RUN pecl install pdo_sqlsrv
-RUN docker-php-ext-enable sqlsrv pdo_sqlsrv
+# Install prerequisites for the sqlsrv and pdo_sqlsrv PHP extensions.
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && apt-get install -y msodbcsql17 mssql-tools unixodbc-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Retrieve the script used to install PHP extensions from the source container.
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/bin/install-php-extensions
+
+# Install required PHP extensions and all their prerequisites available via apt.
+RUN chmod uga+x /usr/bin/install-php-extensions \
+    && sync \
+    && install-php-extensions bcmath ds exif gd intl opcache pcntl pdo_sqlsrv redis sqlsrv zip
 
 # install node js
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
