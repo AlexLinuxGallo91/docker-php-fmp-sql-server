@@ -1,0 +1,21 @@
+version: "3.8"
+
+services:
+
+  php-fpm:
+    image: php-fpm-sql-srv
+    build: 
+      context: ./docker/php-fpm
+      dockerfile: Dockerfile
+    container_name: php-fpm-sql-srv
+    restart: unless-stopped
+    volumes:
+      - .:/test_sql
+    dns:
+      - 8.8.8.8
+    networks:
+      - itoc-sql-server-test
+      
+networks:
+  itoc-sql-server-test:
+    driver: bridge
