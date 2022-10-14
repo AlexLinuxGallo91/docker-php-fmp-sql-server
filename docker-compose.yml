@@ -16,17 +16,17 @@ services:
     networks:
       - itoc-sql-server-test
   
-  sql-server:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql-server
-    restart: unless-stopped
-    environment:
-      ACCEPT_EULA: ${DOCKER_SQL_SERVER_ACCEPT_EULA}
-      MSSQL_SA_PASSWORD: ${DOCKER_SQL_SERVER_PASSWORD}
-    ports:
-      - 1433:1433
-    networks:
-      - itoc-sql-server-test
+  # sql-server:
+  #   image: mcr.microsoft.com/mssql/server:2022-latest
+  #   container_name: sql-server
+  #   restart: unless-stopped
+  #   environment:
+  #     ACCEPT_EULA: ${DOCKER_SQL_SERVER_ACCEPT_EULA}
+  #     MSSQL_SA_PASSWORD: ${DOCKER_SQL_SERVER_PASSWORD}
+  #   ports:
+  #     - 1433:1433
+  #   networks:
+  #     - itoc-sql-server-test
       
 networks:
   itoc-sql-server-test:
