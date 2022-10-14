@@ -12,7 +12,8 @@ RUN echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
 RUN /bin/bash -c 'source ~/.bashrc'
 
 RUN apt-get install -y unixodbc-dev
-# RUN apt-get install -y libgssapi-krb5-2
+RUN apt-get install -y libgssapi-krb5-2
+RUN sed -i -E 's/(CipherString\s*=\s*DEFAULT@SECLEVEL=)2/\11/' /etc/ssl/openssl.cnf
 
 ## instalacion drivers php
 RUN pecl install sqlsrv
